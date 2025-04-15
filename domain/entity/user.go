@@ -6,10 +6,10 @@ import (
 )
 
 type User struct {
-	ID        int64     `db:"id"`
-	Name      string    `db:"name"`
-	CreatedAt time.Time `db:"created_at"`
-	UpdatedAt time.Time `db:"updated_at"`
+	id        int64     `db:"id"`
+	name      string    `db:"name"`
+	createdAt time.Time `db:"created_at"`
+	updatedAt time.Time `db:"updated_at"`
 }
 
 func nameValidate(name string) error {
@@ -30,7 +30,7 @@ func NewUser(name string) (*User, error) {
 	}
 
 	return &User{
-		Name: name,
+		name: name,
 	}, nil
 }
 
@@ -39,7 +39,7 @@ func ReconstructUser(id int64, name string, createdAt time.Time, updatedAt time.
 		return nil, err
 	}
 
-	return &User{ID: id, Name: name, CreatedAt: createdAt, UpdatedAt: updatedAt}, nil
+	return &User{id: id, name: name, createdAt: createdAt, updatedAt: updatedAt}, nil
 }
 
 func (u *User) UpdateName(name string) error {
@@ -47,7 +47,23 @@ func (u *User) UpdateName(name string) error {
 		return err
 	}
 
-	u.Name = name
+	u.name = name
 
 	return nil
+}
+
+func (u *User) GetID() int64 {
+	return u.id
+}
+
+func (u *User) GetName() string {
+	return u.name
+}
+
+func (u *User) GetCreatedAt() time.Time {
+	return u.createdAt
+}
+
+func (u *User) GetUpdatedAt() time.Time {
+	return u.updatedAt
 }

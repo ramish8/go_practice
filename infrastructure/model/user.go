@@ -14,8 +14,8 @@ type User struct {
 
 func FromDomain(e *entity.User) *User {
 	return &User{
-		ID:   e.ID,
-		Name: e.Name,
+		ID:   e.GetID(),
+		Name: e.GetName(),
 	}
 }
 

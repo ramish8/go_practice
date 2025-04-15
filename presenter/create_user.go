@@ -20,10 +20,10 @@ func NewUserPresenter() *UserPresenter {
 
 func (p *UserPresenter) CreateUser(ctx echo.Context, output *output.CreateUserOutput) error {
 	response := api.CreateUserResponse{
-		ID:        output.User.ID,
-		Name:      output.User.Name,
-		CreatedAt: output.User.CreatedAt,
-		UpdatedAt: output.User.UpdatedAt,
+		ID:        output.User.GetID(),
+		Name:      output.User.GetName(),
+		CreatedAt: output.User.GetCreatedAt(),
+		UpdatedAt: output.User.GetUpdatedAt(),
 	}
 	return ctx.JSON(http.StatusCreated, response)
 }

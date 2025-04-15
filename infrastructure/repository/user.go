@@ -42,7 +42,7 @@ func (r *UserRepository) FindByID(ctx context.Context, id int64) (*entity.User, 
 }
 
 func (r *UserRepository) Update(ctx context.Context, user *entity.User) (int64, error) {
-	row := r.db.QueryRowContext(ctx, "UPDATE users SET name = $1 WHERE id = $2 RETURNING id", user.Name, user.ID)
+	row := r.db.QueryRowContext(ctx, "UPDATE users SET name = $1 WHERE id = $2 RETURNING id", user.GetName(), user.GetID())
 
 	var id int64
 	if err := row.Scan(&id); err != nil {

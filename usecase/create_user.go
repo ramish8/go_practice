@@ -21,11 +21,12 @@ func NewCreateUserUsecase(ur repository.IUserRepository) *createUserUsecase {
 }
 
 func (u *createUserUsecase) Execute(ctx context.Context, input *input.CreateUserInput) (*output.CreateUserOutput, error) {
-	e := entity.User{
-		Name: input.Name,
+	e, err := entity.NewUser(input.Name)
+	if err != nil {
+		return nil, err
 	}
 
-	id, err := u.ur.Create(ctx, &e)
+	id, err := u.ur.Create(ctx, e)
 	if err != nil {
 		return nil, err
 	}
