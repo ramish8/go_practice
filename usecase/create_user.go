@@ -4,10 +4,12 @@ import (
 	"context"
 	"go_practice/domain/entity"
 	"go_practice/domain/repository"
+	"go_practice/usecase/dto/input"
+	"go_practice/usecase/dto/output"
 )
 
 type ICreateUserUsecase interface {
-	Execute(ctx context.Context, name string) (int64, error)
+	Execute(ctx context.Context, input *input.CreateUserInput) (*output.CreateUserOutput, error)
 }
 
 type createUserUsecase struct {
@@ -18,15 +20,22 @@ func NewCreateUserUsecase(ur repository.IUserRepository) *createUserUsecase {
 	return &createUserUsecase{ur: ur}
 }
 
-func (u *createUserUsecase) Execute(ctx context.Context, name string) (int64, error) {
-	user := entity.User{
-		Name: name,
+func (u *createUserUsecase) Execute(ctx context.Context, input *input.CreateUserInput) (*output.CreateUserOutput, error) {
+	e := entity.User{
+		Name: input.Name,
 	}
 
-	id, err := u.ur.Create(ctx, &user)
+	id, err := u.ur.Create(ctx, &e)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return id, nil
+	user, err := u.ur.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &output.CreateUserOutput{
+		User: user,
+	}, nil
 }

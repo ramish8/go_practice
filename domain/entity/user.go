@@ -39,12 +39,7 @@ func ReconstructUser(id int64, name string, createdAt time.Time, updatedAt time.
 		return nil, err
 	}
 
-	return &User{
-		ID:        id,
-		Name:      name,
-		CreatedAt: createdAt,
-		UpdatedAt: updatedAt,
-	}, nil
+	return &User{ID: id, Name: name, CreatedAt: createdAt, UpdatedAt: updatedAt}, nil
 }
 
 func (u *User) UpdateName(name string) error {

@@ -1,27 +1,48 @@
 package controller
 
 import (
-	"context"
-	"fmt"
+	"go_practice/api"
+	"go_practice/presenter"
 	"go_practice/usecase"
-	"net/http"
+	"go_practice/usecase/dto/input"
+
+	"github.com/labstack/echo/v4"
 )
 
 type UserController struct {
 	createUserUsecase usecase.ICreateUserUsecase
+	userPresenter     presenter.IUserPresenter
+	errorPresenter    presenter.IErrorPresenter
 }
 
-func NewUserController(createUserUsecase usecase.ICreateUserUsecase) *UserController {
-	return &UserController{createUserUsecase: createUserUsecase}
+func NewUserController(
+	createUserUsecase usecase.ICreateUserUsecase,
+	userPresenter presenter.IUserPresenter,
+	errorPresenter presenter.IErrorPresenter,
+) *UserController {
+	return &UserController{
+		createUserUsecase: createUserUsecase,
+		userPresenter:     userPresenter,
+		errorPresenter:    errorPresenter,
+	}
 }
 
-func (c *UserController) CreateUser(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-	name := r.FormValue("name")
-	id, err := c.createUserUsecase.Execute(ctx, name)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+func (c *UserController) CreateUser(e echo.Context) error {
+	param := api.CreateUserRequest{}
+	if err := e.Bind(&param); err != nil {
+		return c.errorPresenter.BadRequest(e, err)
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(fmt.Sprintf("User created: %d", id)))
+	ctx := e.Request().Context()
+	input := &input.CreateUserInput{
+		Name: param.Name,
+	}
+
+	user, err := c.createUserUsecase.Execute(ctx, input)
+
+	if err != nil {
+		return c.errorPresenter.InternalServerError(e, err)
+	}
+
+	return c.userPresenter.CreateUser(e, user)
 }

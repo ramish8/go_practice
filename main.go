@@ -1,25 +1,25 @@
 package main
 
 import (
-	"net/http"
-
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"go_practice/controller"
+	"go_practice/infrastructure"
+	"go_practice/infrastructure/repository"
+	"go_practice/presenter"
+	"go_practice/usecase"
+	"log"
 )
 
 func main() {
-	// Echo instance
-	e := echo.New()
+	db, err := infrastructure.NewDB()
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
 
-	// Middleware
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-
-	// Routes
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
-
-	// Start server
-	e.Logger.Fatal(e.Start(":8080"))
+	ur := repository.NewUserRepository(db)
+	up := presenter.NewUserPresenter()
+	ep := presenter.NewErrorPresenter()
+	uu := usecase.NewCreateUserUsecase(ur)
+	uc := controller.NewUserController(uu, up, ep)
+	server := infrastructure.NewServer(uc)
+	server.InitRouter()
 }
